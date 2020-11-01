@@ -4,3 +4,6 @@ pandas==1.0.1
 streamlit==0.70.0
 plotly==4.8.2
 plotly-geo
+geopandas==0.3.0
+pyshp==1.2.10
+shapely==1.6.3
