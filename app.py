@@ -16,12 +16,10 @@ st.title('Child Opportunity Index')
 if nav == 'Home Page':
     st.markdown("Neighborhoods matter for children's health and development. All children should live in neighbordhoods with access to good schools, healthy foods, safe parks and playgrounds, clean air, safe housing and living-wage jobs for the adults in their lives. However, far too many children live in neighborhoods that lack these conditions.")
 
-
     st.subheader("What is the Child Opportunity Index?")
     st.info("The Child Opportunity Index (COI) measures neighborhood opportunity along three domains that matter for children: 1) Education, 2) Health and Environment, and 3) Social and Economic.")
 
     st.markdown("The COI ranks neighborhood opportunity based on 29 common conditions within these domains. Each neighborhood receives a Child Opportunity Score and is assigned to an opportunity level: very low, low, moderate, high, or very high opportunity.")
-
 
     st.subheader("Data Source:")
     st.markdown("[DiversityDataKids.org](http://www.diversitydatakids.org/child-opportunity-index)")
@@ -66,7 +64,8 @@ elif nav == 'Population Statistics':
     data = data[data['stateusps']==state]
     data = data[data['year']==year]
     
-
+    st.write("Total Population in " + state + ": ", data['pop'].sum()) 
+    
     values = [data['aian'].sum(),
               data['api'].sum(),
               data['black'].sum(),
@@ -92,22 +91,21 @@ elif nav == 'Population Statistics':
     st.plotly_chart(fig)
 
     st.subheader('Population by County')
-    select_race = names
-    race = st.selectbox('Select Population:', (select_race))
     
-    # Filter by Race
-    # show a map by county of race selected
-    st.write("Placeholder for map")
+    st.write("The map below shows the average State-normed Child Opportunity Scores (from 1 to 100) for the overall COI for each county. Note that, the COI score for each GEOID within a county is averaged.")
     
-    fips = list(data.countyfips)
-    values = data["r_coi_stt"]
+    races = ['aian', 'api', 'black', 'hisp', 'other2', 'nonwhite', 'white']
+    race = st.selectbox('Select Population:', (races))
+    county_race = data.groupby(['countyfips'])[races].agg('sum').reset_index()
+    
+    fips = list(county_race.countyfips)
+    values = county_race[race]
     
     fig = ff.create_choropleth(fips=fips, 
                                values=values, 
                                scope=[state],
-                               binning_endpoints=[20, 40, 60, 80, 100],
                                county_outline={'color': 'rgb(255,255,255)', 'width': 0.5},
-                               legend_title='COI by County'
+                               legend_title='Population by County'
                                )
     fig.layout.template = None
     st.plotly_chart(fig)
@@ -118,6 +116,9 @@ elif nav == 'Population Statistics':
     
     # Filter data
     data = data[data['countyfips']==county]
+    
+    st.write("Total Population in ", str(county), ": ", data['pop'].sum()) 
+    
     
     values = [data['aian'].sum(),
               data['api'].sum(),
@@ -174,6 +175,9 @@ elif nav == 'Child Opportunity Index':
     
     # Select State
     st.subheader('Statistics by State')
+    
+    st.write("The map below shows the average State-normed Child Opportunity Scores (from 1 to 100) for the overall COI for each county. Note that, the COI score for each GEOID within a county is averaged.")
+    
     list_states = list(data['stateusps'].unique())
     state = st.selectbox('Select State:', (list_states))
     
@@ -185,8 +189,10 @@ elif nav == 'Child Opportunity Index':
     data = data[data['stateusps']==state]
     data = data[data['year']==year]
     
-    fips = list(data.countyfips)
-    values = data["r_coi_stt"]
+    map_d = data.groupby(['countyfips'])['r_coi_stt'].agg('mean').reset_index()
+    
+    fips = list(map_d.countyfips)
+    values = map_d["r_coi_stt"]
     
     fig = ff.create_choropleth(fips=fips, 
                                values=values, 
@@ -203,6 +209,9 @@ elif nav == 'Child Opportunity Index':
     list_counties = list(data['countyfips'].unique())
     county = st.selectbox('Select County FIP Code:', (list_counties))
     
+    
+    data = data[data['countyfips']==county]
+    st.write(data)
     
    
     
