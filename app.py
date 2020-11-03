@@ -91,9 +91,7 @@ elif nav == 'Population Statistics':
     st.plotly_chart(fig)
 
     st.subheader('Population by County')
-    
-    st.write("The map below shows the average State-normed Child Opportunity Scores (from 1 to 100) for the overall COI for each county. Note that, the COI score for each GEOID within a county is averaged.")
-    
+        
     races = ['aian', 'api', 'black', 'hisp', 'other2', 'nonwhite', 'white']
     race = st.selectbox('Select Population:', (races))
     county_race = data.groupby(['countyfips'])[races].agg('sum').reset_index()
